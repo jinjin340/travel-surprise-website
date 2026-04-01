@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="no-referrer">
+    <title>给小羊的下一站惊喜 ✈️</title>
+    
+    <script type="text/javascript">
+        // 高德安全密钥
+        window._AMapSecurityConfig = {
+            securityJsCode: '789129f992d79c74aa4f6ab5d9045d50', 
+        }
+    </script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=60761a3e2f0994ed350ebfc3ea791841"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif; }
+        body { background: #fafafa; color: #333; overflow-x: hidden; min-height: 100vh; }
+        .page { display: none; min-height: 100vh; transition: opacity 0.5s ease; opacity: 0; }
+        .page.active { display: block; opacity: 1; animation: fadeIn 0.6s ease forwards; }
+
+        /* --- 首页：命运的开盒狂欢 (星空背景) --- */
+        #home-page { 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
+            overflow: hidden; position: relative;
+        }
+        /* 动态星光点缀 */
+        #home-page::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(white 1px, transparent 1px), radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px; background-position: 0 0, 25px 25px; opacity: 0.1;
+            animation: twinkle 4s infinite alternate;
+        }
+        
+        .hero-title { font-size: 1.8rem; color: #fff; text-shadow: 0 4px 15px rgba(255,105,180,0.5); margin-bottom: 30px; font-weight: 700; z-index: 10; letter-spacing: 2px; line-height: 1.4;}
+        
+        .gacha-container {
+            position: relative; width: 320px; height: 320px; display: flex; 
+            justify-content: center; align-items: center; margin-bottom: 40px; z-index: 10;
+        }
+        
+        .light-rays {
+            position: absolute; width: 500px; height: 500px;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(255,211,42,0.6) 15deg, transparent 30deg, rgba(255,211,42,0.6) 45deg, transparent 60deg, rgba(255,211,42,0.6) 75deg, transparent 90deg, rgba(255,211,42,0.6) 105deg, transparent 120deg, rgba(255,211,42,0.6) 135deg, transparent 150deg, rgba(255,211,42,0.6) 165deg, transparent 180deg, rgba(255,211,42,0.6) 195deg, transparent 210deg, rgba(255,211,42,0.6) 225deg, transparent 240deg, rgba(255,211,42,0.6) 255deg, transparent 270deg, rgba(255,211,42,0.6) 285deg, transparent 300deg, rgba(255,211,42,0.6) 315deg, transparent 330deg, rgba(255,211,42,0.6) 345deg, transparent 360deg);
+            border-radius: 50%; opacity: 0; transform: scale(0); transition: all 0.5s ease; z-index: 1; pointer-events: none;
+        }
+        .light-rays.show { opacity: 1; transform: scale(1); animation: spinRays 8s linear infinite; }
+        
+        .capsule { width: 150px; height: 150px; position: relative; z-index: 10; cursor: pointer; }
+        .cap-top { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 50%; 
+            background: radial-gradient(circle at 30% 30%, #ff4757, #c0392b); 
+            border-radius: 75px 75px 0 0; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3); 
+            border-bottom: 5px solid #bdc3c7; transform-origin: bottom center; 
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 2; 
+        }
+        .cap-bottom { 
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; 
+            background: radial-gradient(circle at 70% 70%, #ffffff, #ecf0f1); 
+            border-radius: 0 0 75px 75px; box-shadow: inset 10px 10px 20px rgba(0,0,0,0.1); 
+            transform-origin: top center; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1; 
+        }
+        
+        .capsule.shake { animation: vibrate 0.1s linear infinite both; }
+        .capsule.open .cap-top { transform: translateY(-100px) rotate(-25deg); opacity: 0; }
+        .capsule.open .cap-bottom { transform: translateY(100px) rotate(25deg); opacity: 0; }
+
+        .draw-result-text { 
+            position: absolute; z-index: 20; font-size: 3rem; font-weight: 900; 
+            color: #fff; text-shadow: 0 4px 15px rgba(255, 71, 87, 0.9), 0 0 40px #ffd32a; 
+            opacity: 0; transform: scale(0); transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1.5); 
+            white-space: nowrap; pointer-events: none; letter-spacing: 2px;
+        }
+        .draw-result-text.show { opacity: 1; transform: scale(1); }
+
+        .btn-draw {
+            background-color: #ff4757; color: white; border: none; padding: 18px 60px;
+            font-size: 1.3rem; font-weight: bold; border-radius: 40px; cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5); z-index: 10; position: relative;
+            transition: all 0.2s; letter-spacing: 1px;
+        }
+        .btn-draw:active { transform: scale(0.95); }
+
+        /* --- 弹窗 --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
+        .modal-content {
+            background: white; padding: 35px 30px; border-radius: 24px; text-align: center; width: 85%; max-width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        .btn-lock { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 14px 30px; border-radius: 30px; font-size: 1.1rem; width: 100%; margin-top: 25px; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(255,71,87,0.3);}
+
+        /* --- 详情页：小红书沉浸游记 --- */
+        #dest-page { background: #fff; padding-bottom: 80px; }
+        
+        .xhs-header {
+            display: flex; align-items: center; padding: 15px 20px; position: sticky; top: 0; background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid #eee;
+        }
+        .xhs-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #ff4757, #ff7eb3); color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; margin-right: 12px; }
+        .xhs-user-info { flex-grow: 1; }
+        .xhs-user-name { font-size: 1rem; font-weight: 600; color: #333; }
+        .xhs-user-tag { font-size: 0.75rem; color: #999; }
+        .xhs-follow-btn { border: 1px solid #ff4757; color: #ff4757; padding: 4px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+
+        /* 纯 CSS 高定封面容器 */
+        .dest-cover-container {
+            width: 100%; height: 50vh; overflow: hidden; position: relative;
+        }
+        
+        .xhs-body { padding: 25px 20px; max-width: 600px; margin: 0 auto; }
+        .xhs-title { font-size: 1.5rem; font-weight: 700; color: #111; margin-bottom: 15px; line-height: 1.4; letter-spacing: 0.5px; }
+        .xhs-desc { font-size: 1rem; color: #444; line-height: 1.8; margin-bottom: 25px; white-space: pre-wrap; font-weight: 400;}
+        
+        .xhs-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+        .xhs-tag { color: #1f3c88; background: #f0f4ff; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;}
+
+        .xhs-itinerary { background: #fafafa; border-radius: 16px; padding: 20px; margin-bottom: 30px; border: 1px solid #eee;}
+        .xhs-itinerary h3 { font-size: 1.1rem; color: #333; margin-bottom: 20px; display: flex; align-items: center; }
+        .xhs-itinerary h3 span { margin-right: 8px; font-size: 1.3rem; }
+        .day-item { margin-bottom: 18px; padding-left: 18px; border-left: 3px solid #ff9a9e; position: relative;}
+        .day-item::before { content: ''; position: absolute; left: -7px; top: 2px; width: 11px; height: 11px; background: #ff4757; border-radius: 50%; border: 2px solid #fff; }
+        .day-title { font-weight: 700; color: #ff4757; font-size: 1rem; margin-bottom: 6px; }
+        .day-detail { color: #555; font-size: 0.95rem; line-height: 1.6; }
+
+        .map-section { margin-bottom: 35px; }
+        .map-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; }
+        .map-title span { margin-right: 8px; font-size: 1.3rem; }
+        #map-container { width: 100%; height: 250px; border-radius: 16px; overflow: hidden; background: #eee; box-shadow: 0 6px 15px rgba(0,0,0,0.05); border: 1px solid #eee;}
+
+        .xhs-footer { display: flex; justify-content: space-around; border-top: 1px solid #eee; padding: 15px 0; color: #666; font-size: 1.1rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); position: fixed; bottom: 0; width: 100%; max-width: inherit; z-index: 100;}
+        .xhs-footer div { display: flex; align-items: center; gap: 5px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes twinkle { from { opacity: 0.1; } to { opacity: 0.3; } }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+    </style>
+</head>
+<body>
+
+    <div id="home-page" class="page active">
+        <h1 class="hero-title">小羊同学，<br>准备开启我们的专属副本了吗？</h1>
+        
+        <div class="gacha-container">
+            <div class="light-rays" id="light-rays"></div>
+            <div class="capsule" id="capsule">
+                <div class="cap-top"></div>
+                <div class="cap-bottom"></div>
+            </div>
+            <div class="draw-result-text" id="draw-result-text">加载中</div>
+        </div>
+
+        <button class="btn-draw" id="btn-draw">点击开盒 🎁</button>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <h3 style="color:#ff4757;margin-bottom:15px;font-size:1.5rem;">🎉 小羊的 SSR 级掉落！</h3>
+            <p id="modal-desc" style="color:#555;line-height:1.7; font-size: 1.05rem;"></p>
+            <button class="btn-lock" id="btn-lock">确认锁定！查看攻略</button>
+        </div>
+    </div>
+
+    <div id="dest-page" class="page">
+        <div class="xhs-header">
+            <div class="xhs-avatar">👨‍💻</div>
+            <div class="xhs-user-info">
+                <div class="xhs-user-name">专属向导：王子涵</div>
+                <div class="xhs-user-tag" id="current-time-tag">刚刚为小羊更新了这篇笔记</div>
+            </div>
+            <div class="xhs-follow-btn">🌟 小羊专属</div>
+        </div>
+
+        <div class="dest-cover-container" id="cover-container">
+        </div>
+
+        <div class="xhs-body">
+            <h1 class="xhs-title" id="note-title">标题</h1>
+            <div class="xhs-desc" id="note-desc">文案</div>
+
+            <div class="xhs-tags" id="note-tags"></div>
+
+            <div class="map-section">
+                <div class="map-title"><span>📍</span> 目的地雷达定位</div>
+                <div id="map-container"></div>
+            </div>
+
+            <div class="xhs-itinerary">
+                <h3><span>🎒</span> 满分抄作业：5天4夜主线</h3>
+                <div id="itinerary-list"></div>
+            </div>
+        </div>
+
+        <div class="xhs-footer">
+            <div>❤️ 99w+</div>
+            <div>⭐ 99w+</div>
+            <div>💬 99w+</div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 核心数据库 V4.0：告别外部图片，采用高级纯 CSS 渐变 UI + 专属 Emoji
+        // 百分百加载成功，视觉极具高级感！
+        // ==========================================
+        const locationsDB = {
+            'kunming': {
+                name: '昆明', lng: 102.71, lat: 25.04, emoji: '🕊️', gradient: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+                title: '✨春城漫游，属于我们的5天4夜浪漫副本！',
+                note: '在这个世界里，没有硬核的跑图任务，只有满级的风景掉落。给你准备了一份超级走心的昆明逛吃攻略，跟我一起解锁神仙玩法吧！👇',
+                tags: ['#昆明旅行', '#带小羊看世界', '#浪漫惊喜', '#周末去哪儿'],
+                days: [
+                    'Day1: ✈️落地昆明 -> 🏨入住滇池周边 -> 🌅海埂大坝看绝美日落喂海鸥',
+                    'Day2: 🌸斗南花市（实现几十块钱的鲜花自由） -> ☕昆明老街（喝咖啡拍复古大片）',
+                    'Day3: 🏞️西山风景区（俯瞰滇池全貌） -> 🏮南屏街逛吃（野生菌火锅安排上）',
+                    'Day4: 🌲翠湖公园散步 -> 🏛️云南省博物馆（感受历史底蕴）',
+                    'Day5: 🛍️扫荡鲜花饼和伴手礼 -> ✈️满载幸福回家啦'
+                ]
+            },
+            'sanya': {
+                name: '三亚', lng: 109.51, lat: 18.25, emoji: '🥥', gradient: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)',
+                title: '🥥逃离班味！带小羊去三亚开启度假躺平模式',
+                note: '大海、椰林、敞篷车... 这次的三亚之行，你的任务只有一个：穿得美美的，然后无脑跟着我！行李我扛，攻略我做，防晒我涂！',
+                tags: ['#三亚旅游', '#看海', '#情侣度假', '#小羊的专属向导'],
+                days: [
+                    'Day1: ✈️到达三亚 -> 🏨入住海棠湾五星酒店 -> 🏊无边泳池瘫着',
+                    'Day2: 🏄‍♂️后海村体验冲浪（我负责抓拍水下大片） -> 🦞第一市场吃海鲜（我负责剥虾）',
+                    'Day3: 🚗租敞篷跑车沿太阳湾最美公路兜风 -> 🌅椰梦长廊追绝美日落',
+                    'Day4: 🏝️蜈支洲岛一日游 -> 🚁体验直升机看玻璃海',
+                    'Day5: 免税店疯狂Shopping（买单我来） -> ✈️返程'
+                ]
+            },
+            'banna': {
+                name: '西双版纳', lng: 100.79, lat: 22.01, emoji: '🐘', gradient: 'linear-gradient(135deg, #13547a 0%, #80d0c7 100%)',
+                title: '🐘不出国体验异域风情，版纳5日游超全攻略',
+                note: '想带小羊去热带雨林做一回在逃公主。这篇笔记总结了版纳最出片的几个机位，全程高甜预警！',
+                tags: ['#西双版纳', '#星光夜市', '#傣族写真'],
+                days: [
+                    'Day1: ✈️到达告庄 -> 🏨入住异域风情民宿 -> 🍜吃正宗傣味手抓饭',
+                    'Day2: 🛕曼听公园漫步 -> 👗星光夜市换装做傣族大小姐（全场最靓就是你）',
+                    'Day3: 🐘野象谷探秘雨林 -> ☕江边咖啡馆发呆吹风',
+                    'Day4: 🌿中科院热带植物园看奇花异草 -> 💆享受正宗泰式SPA放松',
+                    'Day5: 逛逛水上市场 -> ✈️带着热带温度回家'
+                ]
+            },
+            'beihai': {
+                name: '北海', lng: 109.11, lat: 21.48, emoji: '🛵', gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+                title: '🛵涠洲岛小电驴环岛记，追一场橘子海',
+                note: '去没有天花板的地方呼吸！在北海和涠洲岛，我们要把大自然的 UI 界面拉到最高画质！',
+                tags: ['#北海旅游', '#涠洲岛', '#海岛控'],
+                days: [
+                    'Day1: ✈️抵达北海 -> 🏖️银滩踩水 -> 🦐侨港风情街吃海鲜糖水',
+                    'Day2: 🚢坐船登涠洲岛 -> 🛵租小电驴开启环岛探险',
+                    'Day3: 🌋鳄鱼山地质公园 -> 💧滴水丹屏看果冻海日落',
+                    'Day4: 🌅五彩滩早起看日出 -> ☕南湾街找个清吧微醺',
+                    'Day5: 睡到自然醒 -> 🚢离岛返程'
+                ]
+            },
+            'lijiang': {
+                name: '丽江', lng: 100.23, lat: 26.88, emoji: '🏔️', gradient: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+                title: '🏔️玉龙雪山下的慢时光，只属于我们的丽江',
+                note: '牵着小羊的手走在石板路上，去雪山吸氧，这是一趟能让你彻底卸下疲惫的治愈系旅程。',
+                tags: ['#丽江古城', '#玉龙雪山', '#治愈之旅'],
+                days: [
+                    'Day1: ✈️抵达丽江 -> 🏮大研古城闲逛 -> 听驻唱歌手唱民谣',
+                    'Day2: 🏔️玉龙雪山大索道（氧气羽绒服我包了） -> 💧蓝月谷看蒂芙尼蓝',
+                    'Day3: 🏘️束河古镇（避开人群享受清静） -> ☕找个院子喝茶晒太阳',
+                    'Day4: 🐎拉市海骑马看湿地 -> 🍲晚上吃顿热腾腾的腊排骨火锅',
+                    'Day5: 睡个好觉 -> 挑点特色手工银饰 -> ✈️返程'
+                ]
+            },
+            'xiamen': {
+                name: '厦门', lng: 118.08, lat: 24.47, emoji: '🐈', gradient: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)',
+                title: '🐈文艺感拉满！厦门5天浪漫满分攻略',
+                note: '自带日系滤镜的城市，每个转角都像动漫里的场景。准备好256G的手机内存，我要给小羊拍满！',
+                tags: ['#厦门旅游', '#鼓浪屿', '#沙坡尾'],
+                days: [
+                    'Day1: ✈️到达厦门 -> 🌊环岛路骑双人自行车迎风大笑',
+                    'Day2: 🚢登鼓浪屿 -> 探访百年别墅 -> 最美转角拍写真 -> 撸岛上的猫',
+                    'Day3: ⛩️南普陀寺祈福 -> 🎓厦门大学周边 -> 🏙️沙坡尾打卡文艺小店',
+                    'Day4: 🛣️走一走十里长堤看跨海地铁 -> 🍲去八市吃地道海鲜大排档',
+                    'Day5: 在海边咖啡馆写一张明信片寄给未来 -> ✈️返程'
+                ]
+            },
+            'weihai': {
+                name: '威海', lng: 122.12, lat: 37.51, emoji: '❄️', gradient: 'linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)',
+                title: '❄️假装在国外，威海的绝美海岸线太好拍了',
+                note: '火炬八街的下坡路，猫头山的悬崖咖啡... 威海的每一帧都像是韩剧截图。',
+                tags: ['#威海旅行', '#火炬八街', '#看海'],
+                days: [
+                    'Day1: ✈️落地威海 -> 🛣️直奔火炬八街拍韩系大片 -> 国际海水浴场踩沙',
+                    'Day2: 🐱租车自驾猫头山环海路 -> 悬崖咖啡馆发呆',
+                    'Day3: 🚢刘公岛感受历史 -> 🌃晚上去韩乐坊吃正宗韩国烤肉',
+                    'Day4: 🌊那香海看风车和孤独的沉船 -> 布鲁威斯号沉船打卡',
+                    'Day5: 威海公园大相框合影 -> ✈️满载而归'
+                ]
+            },
+            'liuzhou': {
+                name: '柳州', lng: 109.41, lat: 24.31, emoji: '🍜', gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+                title: '🍜特种兵干饭！为了这口螺蛳粉冲了',
+                note: '这是一场纯粹的味蕾狂欢副本！健胃消食片已备好，小羊放开肚皮跟我吃就完了！',
+                tags: ['#柳州美食', '#螺蛳粉', '#周末吃货游'],
+                days: [
+                    'Day1: 🚄到达柳州 -> 🍜马上安排一碗加炸蛋的螺蛳粉 -> 🚢百里柳江夜游',
+                    'Day2: 🏞️龙潭公园看桂系山水 -> 🍧马鞍山顶看夜景全貌',
+                    'Day3: 🏭柳空文创园拍工业风废土风大片 -> 🍢胜利烤肉城吃宵夜',
+                    'Day4: 🥣逛水南菜市场体验生活 -> 寻觅巷子里的隐秘神仙粉店',
+                    'Day5: 嗦最后一碗粉 -> 打包几袋螺蛳粉 -> 🚄返程'
+                ]
+            },
+            'nanjing': {
+                name: '南京', lng: 118.79, lat: 32.06, emoji: '🍂', gradient: 'linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)',
+                title: '🍂总要去趟南京吧，看梧桐树下的浪漫',
+                note: '金陵城的厚重与文艺，完美融合在这个五天的行程里。排队买鸭子这种NPC任务，交给我。',
+                tags: ['#南京旅游', '#金陵', '#梧桐大道'],
+                days: [
+                    'Day1: 🚄到达南京 -> 🏛️南京博物院穿越时空 -> 🏮夫子庙秦淮河夜游',
+                    'Day2: 🌳钟山风景区 -> 音乐台喂白鸽抓拍瞬间 -> 梧桐大道漫步',
+                    'Day3: 🧱明城墙骑行 -> 🦆老门东逛吃（金陵烤鸭、梅花糕）',
+                    'Day4: 📚先锋书店打卡文艺地标 -> 🚶‍♀️颐和路看民国公馆',
+                    'Day5: 逛新街口商圈买买买 -> 🚄回家'
+                ]
+            },
+            'wuhan': {
+                name: '武汉', lng: 114.30, lat: 30.59, emoji: '🌸', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                title: '🌸江湖气的江城，带小羊过早看长江',
+                note: '一块五的轮渡，香喷喷的热干面，武汉的浪漫充满了人间的烟火气。',
+                tags: ['#武汉旅行', '#长江轮渡', '#过早'],
+                days: [
+                    'Day1: 🚄到达武汉 -> 🍜粮道街体验硬核过早 -> 🚢傍晚花一块五坐长江轮渡看夕阳',
+                    'Day2: 🌸武汉大学看最美校园 -> 🏛️湖北省博物馆',
+                    'Day3: 🏢黄鹤楼远观打卡 -> 🚶‍♀️黎黄陂路看租界洋房拍大片',
+                    'Day4: 🛍️江汉路步行街 -> 🦞晚上去吃靓靓蒸虾',
+                    'Day5: 汉口江滩散步 -> 买周黑鸭 -> 🚄返程'
+                ]
+            },
+            'dali': {
+                name: '大理', lng: 100.22, lat: 25.59, emoji: '☁️', gradient: 'linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)',
+                title: '☁️去有风的地方，大理5天疗愈之旅',
+                note: '骑着小电驴环洱海，这就是我能想到最浪漫的公路电影画面。',
+                tags: ['#大理', '#洱海', '#有风的地方'],
+                days: [
+                    'Day1: ✈️抵达大理 -> 🏮大理古城漫步吃烤乳扇',
+                    'Day2: 🛵租小电驴走环海西路 -> 磻溪村S湾拍照 -> 喜洲古镇看麦浪',
+                    'Day3: ☕双廊古镇找个海景咖啡馆发呆一整天',
+                    'Day4: 🚠苍山洗马潭索道 -> 🌉兴盛大桥拍欧洲感大片',
+                    'Day5: 挑一家好看的临海餐厅吃顿丰盛午餐 -> ✈️返程'
+                ]
+            },
+            'guilin': {
+                name: '桂林', lng: 110.29, lat: 25.27, emoji: '🛶', gradient: 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)',
+                title: '🛶人在画中游，桂林阳朔全景攻略',
+                note: '山水如画，而小羊是我这幅水墨画里唯一的焦点。透明雨伞已备好，随手拍都是大片。',
+                tags: ['#桂林山水', '#阳朔', '#漓江'],
+                days: [
+                    'Day1: ✈️抵达桂林 -> 🐘象鼻山打卡 -> 🌃夜游两江四湖',
+                    'Day2: 🛶乘船游漓江（九马画山、黄布倒影） -> 抵达阳朔吃啤酒鱼',
+                    'Day3: 🛵租车骑行十里画廊 -> 遇龙河竹筏漂流感受刺激冲坝',
+                    'Day4: 🌄相公山俯瞰漓江第一湾 -> 晚上看《印象刘三姐》',
+                    'Day5: 逛逛西街买点伴手礼 -> ✈️返程'
+                ]
+            },
+            'zhangjiajie': {
+                name: '张家界', lng: 110.47, lat: 29.11, emoji: '🌲', gradient: 'linear-gradient(135deg, #accbee 0%, #e7f0fd 100%)',
+                title: '🌲探秘潘多拉星球，张家界奇幻探险',
+                note: '这可是个体力活副本，但我会是小羊最坚实的补给站和背包客！',
+                tags: ['#张家界', '#天门山', '#阿凡达取景地'],
+                days: [
+                    'Day1: ✈️抵达张家界 -> 🏙️市区休整吃特色三下锅',
+                    'Day2: 🚠天门山超长索道 -> 刺激的玻璃栈道 -> 震撼天门洞',
+                    'Day3: 🌲深入武陵源国家森林公园 -> 金鞭溪漫步呼吸负氧离子',
+                    'Day4: 🛗百龙天梯直达袁家界 -> 探寻阿凡达悬浮石',
+                    'Day5: 十里画廊坐小火车游览 -> ✈️返程'
+                ]
+            },
+            'jiuzhaigou': {
+                name: '九寨沟', lng: 103.92, lat: 33.26, emoji: '🌊', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                title: '🌊神奇的九寨，打翻了大自然的调色盘',
+                note: '不用加任何滤镜，这里的大自然UI已经拉到了最高画质。保暖和防高反交给我！',
+                tags: ['#九寨沟', '#人间仙境', '#川西'],
+                days: [
+                    'Day1: ✈️飞抵黄龙机场 -> 🏨入住沟口酒店适应海拔 -> 吃牦牛火锅',
+                    'Day2: 🌊深度游览九寨沟看五花海的绝美渐变蓝',
+                    'Day3: 🏞️九寨沟二进沟（则查洼沟）看长海 -> 诺日朗瀑布',
+                    'Day4: 🏔️前往黄龙景区看钙化池（我陪你坐索道）',
+                    'Day5: 逛逛藏寨体验藏文化 -> ✈️返程'
+                ]
+            },
+            'yazhuang': {
+                name: '芽庄', lng: 109.19, lat: 12.23, emoji: '🏖️', gradient: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
+                title: '🏖️超高性价比出国游，带小羊去芽庄躺平',
+                note: '签证极其方便！跨海缆车、泥浆浴、超便宜的海鲜，带你做无忧无虑的出逃公主。',
+                tags: ['#越南芽庄', '#出国游', '#平价海岛'],
+                days: [
+                    'Day1: ✈️直飞芽庄 -> 🏨入住海景酒店 -> 去夜市吃越南河粉Pho',
+                    'Day2: 🎡珍珠岛游乐园一整天（过山车、动物园全都有）',
+                    'Day3: 🚤包快艇出海跳岛 -> 浮潜看珊瑚小鱼',
+                    'Day4: 💆特色火山泥浆浴体验全身放松 -> 享受正宗越式SPA',
+                    'Day5: 钟屿石岬角喝滴漏咖啡拍照 -> ✈️返程'
+                ]
+            },
+            'yabi': {
+                name: '亚庇', lng: 116.07, lat: 5.98, emoji: '🌅', gradient: 'linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)',
+                title: '🌅世界前三的绝美日落，亚庇浪漫之旅',
+                note: '马来西亚的绝赞海岛！萤火虫之夜简直是大自然给的最高特效，防蚊液我已备好。',
+                tags: ['#亚庇旅游', '#马来西亚', '#绝美日落'],
+                days: [
+                    'Day1: ✈️到达亚庇 -> 🕌打卡水上清真寺 -> 吃肉骨茶',
+                    'Day2: 🏝️美人鱼岛出海浮潜看蓝色眼泪',
+                    'Day3: 🌅傍晚在丹绒亚路海滩等一场世界级火烧云日落',
+                    'Day4: 🐒深入红树林寻觅长鼻猴 -> 夜晚看漫天萤火虫如星海',
+                    'Day5: 市区买买买吃榴莲雪糕 -> ✈️返程'
+                ]
+            },
+            'changsha': {
+                name: '长沙', lng: 112.93, lat: 28.22, emoji: '🧋', gradient: 'linear-gradient(135deg, #f83600 0%, #f9d423 100%)',
+                title: '🌶️不夜城长沙，特种兵吃货挑战赛',
+                note: '这趟的主线任务是每天一杯茶颜悦色！排队交给我，小羊只管负责拍酷酷的赛博朋克大片。',
+                tags: ['#长沙美食', '#茶颜悦色', '#超级文和友'],
+                days: [
+                    'Day1: 🚄到达长沙 -> 🧋火速搞杯茶颜 -> IFS国金中心打卡Kaws',
+                    'Day2: 📸超级文和友拍复古大片 -> 🦞吃爆口味虾和臭豆腐',
+                    'Day3: 🚂橘子洲头坐小火车看伟人雕像 -> 晚上去解放西',
+                    'Day4: 🍁岳麓山赏景 -> 湖南大学小吃街继续吃',
+                    'Day5: 打包几杯幽兰拿铁带上高铁 -> 🚄回家'
+                ]
+            },
+            'qingdao': {
+                name: '青岛', lng: 120.38, lat: 36.06, emoji: '🍻', gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+                title: '🍻红瓦绿树碧海蓝天，青岛微醺日记',
+                note: '提着塑料袋装的啤酒，走在八大关的林荫道上，这座城市把浪漫和烟火气结合得刚刚好。',
+                tags: ['#青岛旅游', '#看海', '#袋装啤酒'],
+                days: [
+                    'Day1: 🚄到达青岛 -> 🕊️栈桥喂海鸥 -> 参观天主教堂',
+                    'Day2: 🏘️漫步八大关拍法式复古大片 -> 小鱼山俯瞰红瓦绿树',
+                    'Day3: 🍻青岛啤酒博物馆 -> 晚上营口路市场吃海鲜哈啤酒',
+                    'Day4: 🌊小麦岛坐在草坪上听街头艺人唱歌看日落',
+                    'Day5: 琴屿路最美转角打卡 -> 🚄满载浪漫而归'
+                ]
+            },
+            'shangrila': {
+                name: '香格里拉', lng: 99.70, lat: 27.82, emoji: '🏔️', gradient: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+                title: '🏔️离天堂最近的地方，寻找心中的日月',
+                note: '高反药和氧气瓶是我的第一任务，小羊只需要在这片神圣的土地上感受心灵的净化。',
+                tags: ['#香格里拉', '#松赞林寺', '#藏地风情'],
+                days: [
+                    'Day1: ✈️飞抵香格里拉 -> 🏨入住供氧客栈 -> 独克宗古城转转经筒',
+                    'Day2: 🕌松赞林寺（小布达拉宫）拍绝美藏服写真',
+                    'Day3: 🌲普达措国家公园看高山湖泊，被绿意治愈',
+                    'Day4: 🏔️远观梅里雪山（日照金山祈福）',
+                    'Day5: 喝一碗热腾腾的酥油茶 -> ✈️返程'
+                ]
+            },
+            'nanchang': {
+                name: '南昌', lng: 115.85, lat: 28.68, emoji: '🔥', gradient: 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)',
+                title: '🔥英雄城的火辣与柔情，南昌5日记',
+                note: '南昌的辣度不可小觑，冰镇饮料随时为你准备！一江两岸的灯光秀保证震撼你的视觉。',
+                tags: ['#南昌旅行', '#滕王阁', '#南昌拌粉'],
+                days: [
+                    'Day1: 🚄到达南昌 -> 🍜先来一碗地道南昌拌粉配瓦罐汤',
+                    'Day2: 🏯滕王阁赏江景 -> ⛲秋水广场看亚洲最大音乐喷泉',
+                    'Day3: 🚢赣江夜游看震撼的一江两岸灯光秀',
+                    'Day4: 🏛️江西省博物馆看海昏侯墓出土文物 -> 万寿宫逛吃',
+                    'Day5: 挑战一下极辣的南昌水煮 -> 🚄返程'
+                ]
+            },
+            'shouer': {
+                name: '首尔', lng: 126.97, lat: 37.56, emoji: '🛍️', gradient: 'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)',
+                title: '🛍️韩剧女主体验卡！首尔逛吃买买买',
+                note: '买单、拎包、做攻略找路线，这是我这次副本的核心修养。穿上舒服的鞋，小羊准备血拼！',
+                tags: ['#韩国首尔', '#买买买', '#韩剧打卡'],
+                days: [
+                    'Day1: ✈️落地首尔 -> 🍖晚上去明洞吃正宗韩牛烤肉',
+                    'Day2: 👗景福宫换韩服拍照 -> 北村韩屋村漫步',
+                    'Day3: 🛍️弘大/圣水洞全天高强度逛街买潮牌（我负责拎包）',
+                    'Day4: 🗼N首尔塔挂同心锁看夜景 -> 吃炸鸡啤酒',
+                    'Day5: 机场免税店最后冲刺 -> ✈️返程'
+                ]
+            },
+            'puji': {
+                name: '普吉岛', lng: 98.39, lat: 7.88, emoji: '🤿', gradient: 'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)',
+                title: '🏖️纯粹的度假蓝调，普吉岛潜水之旅',
+                note: '防水手机壳已备好，带你去安达曼海的水下世界看另一种绚烂。',
+                tags: ['#普吉岛', '#斯米兰潜水', '#泰国游'],
+                days: [
+                    'Day1: ✈️直飞普吉 -> 🏨入住半山海景Villa -> 芭东夜市吃冬阴功',
+                    'Day2: 🤿包船前往斯米兰群岛/皮皮岛深潜看海龟',
+                    'Day3: ☕悬崖餐厅无敌海景下午茶 -> 体验正宗泰式马杀鸡',
+                    'Day4: 🏄‍♀️卡塔海滩冲浪 -> 晚上看一场精彩的特色Show',
+                    'Day5: 买点芒果干和泰式香料 -> ✈️返程'
+                ]
+            },
+            'beijing': {
+                name: '北京', lng: 116.40, lat: 39.90, emoji: '🏰', gradient: 'linear-gradient(135deg, #f43b47 0%, #453a94 100%)',
+                title: '🏰从故宫到霍格沃茨，北京跨越时空之旅',
+                note: '不论是东方美学的大片，还是魔法世界的探险，为你开启无敌模式刷遍所有副本。',
+                tags: ['#北京旅游', '#环球影城', '#故宫博物院'],
+                days: [
+                    'Day1: ✈️抵达北京 -> 🦆晚上吃顿正宗全聚德烤鸭',
+                    'Day2: 🏰故宫博物院红墙黄瓦拍国风大片 -> 景山公园俯瞰紫禁城',
+                    'Day3: 🎢环球影城一整天特种兵打卡（哈利波特冲！）',
+                    'Day4: 🏞️颐和园看皇家园林 -> 什刹海坐黄包车听胡同故事',
+                    'Day5: 买稻香村点心 -> ✈️心满意足回家'
+                ]
+            },
+            'xian': {
+                name: '西安', lng: 108.93, lat: 34.26, emoji: '🏮', gradient: 'linear-gradient(135deg, #c79081 0%, #dfa579 100%)',
+                title: '🏮梦回大唐长安，西安碳水狂欢记',
+                note: '换上汉服，做一回盛唐的大小姐，我在旁边为你提灯。这里的碳水绝对满足你的胃！',
+                tags: ['#西安旅游', '#大唐不夜城', '#碳水之都'],
+                days: [
+                    'Day1: 🚄到达西安 -> 🚴城墙上骑自行车看古城落日',
+                    'Day2: 🗿参观兵马俑感受震撼 -> 晚上回民街/洒金桥吃肉夹馍',
+                    'Day3: 👗换上精美汉服妆造 -> 夜游大唐不夜城拍神仙照片',
+                    'Day4: 🏛️陕西历史博物馆看国宝 -> 长安十二时辰沉浸式体验',
+                    'Day5: 喝一杯茶话弄 -> 带几个柿子饼 -> 🚄返程'
+                ]
+            },
+            'hangzhou': {
+                name: '杭州', lng: 120.15, lat: 30.28, emoji: '🚣', gradient: 'linear-gradient(135deg, #96fbc4 0%, #f9f586 100%)',
+                title: '🚣水光潋滟晴方好，杭州江南诗意行',
+                note: '西湖的摇橹船，灵隐寺的十八籽。行李我扛，小羊只需要在这水墨画中负责貌美如花。',
+                tags: ['#杭州旅游', '#西湖', '#灵隐寺祈福'],
+                days: [
+                    'Day1: 🚄到达杭州 -> 🚣包摇橹船游西湖湖心亭',
+                    'Day2: ⛩️早起去灵隐寺/法喜寺祈福求十八籽 -> 晚上看《印象西湖》',
+                    'Day3: 🍃龙井村茶园漫步品茶 -> 满觉陇闻桂花香',
+                    'Day4: 🏛️西溪湿地坐船感受自然之肺 -> 逛河坊街',
+                    'Day5: 吃一顿正宗杭帮菜（龙井虾仁） -> 🚄返程'
+                ]
+            },
+            'haerbin': {
+                name: '哈尔滨', lng: 126.53, lat: 45.80, emoji: '⛄', gradient: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+                title: '⛄现实版冰雪奇缘，零下二十度的浪漫',
+                note: '极寒预警！但小羊别怕，暖宝宝帽子手套全就位，我就是你专属的人形自走暖炉。',
+                tags: ['#哈尔滨旅游', '#冰雪大世界', '#东方莫斯科'],
+                days: [
+                    'Day1: ✈️抵达哈尔滨 -> ⛪索菲亚教堂广场喂鸽子拍大片',
+                    'Day2: ❄️全副武装冲刺冰雪大世界 -> 体验超长冰滑梯',
+                    'Day3: 🚶‍♀️漫步中央大街 -> 零下二十度吃马迭尔冰棍 -> 吃俄餐',
+                    'Day4: ⛷️亚布力滑雪场体验速度与激情（我护着你）',
+                    'Day5: 搓一顿铁锅炖大鹅暖暖身子 -> ✈️返程'
+                ]
+            }
+        };
+
+        const poolByMonth = {
+            1: ['kunming', 'sanya', 'banna', 'beihai'],
+            2: ['lijiang', 'xiamen', 'weihai', 'liuzhou'],
+            3: ['nanjing', 'wuhan', 'dali', 'liuzhou'],
+            4: ['guilin', 'banna', 'zhangjiajie', 'jiuzhaigou'],
+            5: ['yazhuang', 'yabi', 'xiamen', 'changsha'],
+            6: ['qingdao', 'guilin', 'shangrila', 'changsha'],
+            7: ['kunming', 'lijiang', 'nanjing', 'nanchang'],
+            8: ['weihai', 'dali', 'lijiang', 'beihai'],
+            9: ['nanjing', 'wuhan', 'dali', 'liuzhou'],
+            10: ['shouer', 'puji', 'yabi', 'weihai'],
+            11: ['beijing', 'xian', 'zhangjiajie', 'xiamen'],
+            12: ['hangzhou', 'nanchang', 'changsha', 'haerbin']
+        };
+
+        const getBJTimeStr = () => {
+            const date = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Shanghai"}));
+            return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+        };
+        const getBJMonth = () => new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Shanghai"})).getMonth() + 1;
+
+        const btnDraw = document.getElementById('btn-draw');
+        const capsule = document.getElementById('capsule');
+        const rays = document.getElementById('light-rays');
+        const resultText = document.getElementById('draw-result-text');
+        const modal = document.getElementById('modal');
+        const btnLock = document.getElementById('btn-lock');
+        const homePage = document.getElementById('home-page');
+        const destPage = document.getElementById('dest-page');
+        const coverContainer = document.getElementById('cover-container');
+        let finalDestKey = '';
+        let mapObj = null;
+
+        btnDraw.addEventListener('click', () => {
+            const currentMonth = getBJMonth();
+            const poolKeys = poolByMonth[currentMonth];
+            if(!poolKeys) { alert('本月卡池尚未配置！'); return; }
+
+            btnDraw.disabled = true;
+            btnDraw.style.opacity = '0.5';
+
+            finalDestKey = poolKeys[Math.floor(Math.random() * poolKeys.length)];
+            const destName = locationsDB[finalDestKey].name;
+
+            capsule.classList.add('shake');
+
+            setTimeout(() => {
+                capsule.classList.remove('shake');
+                capsule.classList.add('open');
+                
+                rays.classList.add('show');
+                resultText.innerText = destName;
+                resultText.classList.add('show');
+
+                setTimeout(() => {
+                    document.getElementById('modal-desc').innerHTML = `北京时间 ${getBJTimeStr()} <br><br>命中注定，王子涵将带小羊前往<br><strong>【${destName}】</strong><br>开启我们的独家浪漫副本！`;
+                    modal.classList.add('active');
+                }, 2500);
+
+            }, 1500);
+        });
+
+        btnLock.addEventListener('click', () => {
+            modal.classList.remove('active');
+            const data = locationsDB[finalDestKey];
+
+            document.getElementById('current-time-tag').innerText = `刚刚为小羊更新了这篇笔记`;
+
+            // 【终极防裂图方案】：动态注入纯 CSS 高定流体封面
+            coverContainer.innerHTML = `
+                <div style="width: 100%; height: 100%; background: ${data.gradient}; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                    <div style="font-size: 5rem; margin-bottom: 15px; animation: float 3s ease-in-out infinite;">${data.emoji}</div>
+                    <h1 style="font-size: 2.8rem; font-weight: 800; letter-spacing: 4px; margin-bottom: 10px;">${data.name}</h1>
+                    <p style="font-size: 1.1rem; opacity: 0.9; padding: 0 20px; text-align: center;">${data.title.split('，')[0]}</p>
+                </div>
+            `;
+
+            document.getElementById('note-title').innerText = data.title;
+            document.getElementById('note-desc').innerText = data.note;
+            document.getElementById('note-tags').innerHTML = data.tags.map(t => `<span class="xhs-tag">${t}</span>`).join('');
+
+            document.getElementById('itinerary-list').innerHTML = data.days.map((dayText, idx) => {
+                const parts = dayText.split(': ');
+                return `
+                <div class="day-item">
+                    <div class="day-title">${parts[0] || `Day ${idx+1}`}</div>
+                    <div class="day-detail">${parts[1] || dayText}</div>
+                </div>`;
+            }).join('');
+
+            homePage.classList.remove('active');
+            setTimeout(() => {
+                homePage.style.display = 'none';
+                destPage.classList.add('active');
+                window.scrollTo(0, 0);
+
+                setTimeout(() => {
+                    initAmap(data.lng, data.lat);
+                }, 300);
+            }, 500);
+        });
+
+        function initAmap(lng, lat) {
+            if (typeof AMap === 'undefined') {
+                document.getElementById('map-container').innerHTML = '<div style="padding:20px;text-align:center;color:#999;">请先在代码顶部填入你的高德 API Key 才能显示地图哦</div>';
+                return;
+            }
+            mapObj = new AMap.Map('map-container', {
+                zoom: 11,
+                center: [lng, lat],
+                viewMode: '2D'
+            });
+            const marker = new AMap.Marker({
+                position: new AMap.LngLat(lng, lat),
+                title: '小羊的下一站'
+            });
+            mapObj.add(marker);
+        }
+    </script>
+</body>
+</html>
